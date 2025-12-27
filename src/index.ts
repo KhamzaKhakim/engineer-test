@@ -1,4 +1,5 @@
 import { createDb } from "./db";
+import { Employee } from "./db-types";
 
 const citySource = [
   { uuid: "3ba648aa-4498-43da-b29f-b83f37a25429", name: "Алматы" },
@@ -45,14 +46,15 @@ const employeeSource = [
   },
 ];
 
-
 export interface IHRApp {
   employeeWithCityList: () => Promise<{ firstName: string; city: string }[]>;
-  employeeWithPositionList: () => Promise<{
-    firstName: string;
-    position: string;
-    division: string;
-  }[]>;
+  employeeWithPositionList: () => Promise<
+    {
+      firstName: string;
+      position: string;
+      division: string;
+    }[]
+  >;
   update: (args: {
     entity: "employee" | "city" | "position" | "division";
     data: object;
@@ -62,13 +64,30 @@ export interface IHRApp {
 export const createHRApp = (): IHRApp => {
   const db = createDb();
 
-
   return {
     employeeWithCityList: async () => {
-      return [];
+      const res = await db.query({ type: "employee", where: {} });
+
+      return res.items.map((r) => {
+        const employee = r.data as Employee;
+
+        return {
+          firstName: employee.firstName,
+          city: employee.cityName,
+        };
+      });
     },
     employeeWithPositionList: async () => {
-      return [];
+      const res = await db.query({ type: "employee", where: {} });
+
+      return res.items.map((r) => {
+        const e = r.data as Employee;
+        return {
+          firstName: e.firstName,
+          position: e.positionName,
+          division: e.divisionName,
+        };
+      });
     },
     update: async () => {
       // этот метод имплементировать не нужно
